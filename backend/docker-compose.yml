@@ -23,7 +23,7 @@ services:
       - "5432:5432"
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=11111111
       - POSTGRES_DB=kanban_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
