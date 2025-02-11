@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.task-card {
+  @apply transform transition-all duration-200;
+}
+
+.task-card:hover {
+  @apply shadow-lg -translate-y-1;
+}
+
+.kanban-column {
+  @apply bg-gray-50 rounded-lg p-4 shadow-md;
+  min-height: 70vh;
+}
