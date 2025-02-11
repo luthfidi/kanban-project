@@ -9,6 +9,7 @@ import {
   VStack,
   Text,
   useToast,
+  Link as ChakraLink,
 } from '@chakra-ui/react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -83,9 +84,9 @@ const RegisterForm = () => {
 
         <Text>
           Already have an account?{' '}
-          <Link to="/login" className="text-blue-500 hover:underline">
+          <ChakraLink as={Link} to="/login" color="blue.400" _hover={{ color: "blue.500" }} fontWeight="medium">
             Login here
-          </Link>
+          </ChakraLink>
         </Text>
       </VStack>
     </Box>
