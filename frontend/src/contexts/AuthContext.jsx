@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as authService from '../services/auth';
+import LoadingSpinner from '../components/LoadingSpinner'; // Tambahkan import ini
 
 const AuthContext = createContext(null);
 
@@ -63,7 +64,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   return (

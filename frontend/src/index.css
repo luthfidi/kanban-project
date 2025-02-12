@@ -30,3 +30,41 @@ body {
   @apply bg-gray-50 rounded-lg p-4 shadow-md;
   min-height: 70vh;
 }
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3182CE;
+  border-radius: 8px;
+  min-height: 40px;  /* Minimum height for the thumb */
+  max-height: 100px; /* Maximum height for the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2B6CB0; /* Slightly darker blue on hover */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3182CE #f1f1f1;
+}
+
+/* Hide scrollbar when not scrolling (optional) */
+::-webkit-scrollbar-thumb {
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  opacity: 1;
+}
