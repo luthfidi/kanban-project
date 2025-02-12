@@ -74,16 +74,16 @@ const TaskCard = ({ task, onEdit, onDelete }) => {
             {task.category && (
               <Badge 
                 colorScheme="red" 
-                bg="pink.100"
-                color="red.800"
+                bg="red.400"
+                color="gray.100"
               >
                 {task.category.toUpperCase()}
               </Badge>
             )}
             <Badge 
               colorScheme="red"
-              bg="pink.100"
-              color="red.800"
+              bg="red.400"
+              color="gray.100"
             >
               {formatDueDate(task.due_date)}
             </Badge>
