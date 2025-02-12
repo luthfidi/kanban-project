@@ -78,12 +78,18 @@ func (tc *TaskController) UpdateTask(c echo.Context) error {
 
     var req models.UpdateTaskRequest
     if err := c.Bind(&req); err != nil {
+        log.Printf("Error binding request: %v", err)
         return echo.NewHTTPError(http.StatusBadRequest, "Invalid request body")
     }
 
-    // Log received update data for debugging
-    log.Printf("Received update task data: %+v", req)
-    log.Printf("Update due date: %v", req.DueDate)
+    // Log tanggal yang diterima
+    log.Printf("Received task update - ID: %d, Status: %s, DueDate: %v", 
+        taskID, req.Status, req.DueDate)
+
+    // Jika tanggal tidak valid, gunakan tanggal yang ada
+    if req.DueDate.IsZero() {
+        req.DueDate = task.DueDate
+    }
 
     updates := map[string]interface{}{
         "title":       req.Title,
@@ -98,6 +104,10 @@ func (tc *TaskController) UpdateTask(c echo.Context) error {
         log.Printf("Error updating task: %v", result.Error)
         return echo.NewHTTPError(http.StatusInternalServerError, "Failed to update task")
     }
+
+    // Log task setelah update
+    log.Printf("Task updated successfully - ID: %d, New Status: %s, New DueDate: %v",
+        taskID, task.Status, task.DueDate)
 
     return c.JSON(http.StatusOK, task)
 }

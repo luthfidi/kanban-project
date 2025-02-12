@@ -57,9 +57,9 @@ const TaskForm = ({ isOpen, onClose, task = null, onTaskSaved }) => {
   useEffect(() => {
     if (task) {
       let dueDateStr = '';
-      if (task.DueDate) {
+      if (task.due_date) {
         try {
-          const date = new Date(task.DueDate);
+          const date = new Date(task.due_date);
           if (!isNaN(date.getTime())) {
             dueDateStr = date.toISOString().split('T')[0];
           }
@@ -69,15 +69,25 @@ const TaskForm = ({ isOpen, onClose, task = null, onTaskSaved }) => {
       }
 
       setFormData({
-        Title: task.Title || '',
-        Description: task.Description || '',
-        Category: task.Category || '',
+        Title: task.title || '',
+        Description: task.description || '',
+        Category: task.category || '',
         DueDate: dueDateStr,
-        Status: task.Status || 'todo',
-        Color: task.Color || 'default',
+        Status: task.status || 'todo',
+        Color: task.color || 'default',
+      });
+    } else {
+      // Reset form when opening a new task
+      setFormData({
+        Title: '',
+        Description: '',
+        Category: '',
+        DueDate: '',
+        Status: 'todo',
+        Color: 'default',
       });
     }
-  }, [task]);
+  }, [task, isOpen]); // Added isOpen dependency to reset form when modal opens
 
   const validateForm = () => {
     const newErrors = {};
@@ -115,11 +125,11 @@ const TaskForm = ({ isOpen, onClose, task = null, onTaskSaved }) => {
   const formatDateForGo = (dateString) => {
     if (!dateString) return null;
     
-    // Parse input date (YYYY-MM-DD) dan set waktu ke midnight UTC
+    // Parse input date (YYYY-MM-DD) and set time to midnight UTC
     const [year, month, day] = dateString.split('-').map(Number);
     const date = new Date(Date.UTC(year, month - 1, day));
     
-    // Format sesuai RFC3339 yang diharapkan oleh Go
+    // Format according to RFC3339
     return date.toISOString();
   };
 
@@ -133,15 +143,16 @@ const TaskForm = ({ isOpen, onClose, task = null, onTaskSaved }) => {
     setLoading(true);
 
     try {
-      // Format data untuk backend
+      // Format data for backend
       const formattedData = {
         ...formData,
-        DueDate: formatDateForGo(formData.DueDate)
+        DueDate: formData.DueDate ? formatDateForGo(formData.DueDate) : null
       };
 
-      // Log untuk debugging
+      // Log for debugging
       console.log('Raw date from form:', formData.DueDate);
       console.log('Formatted date:', formattedData.DueDate);
+      console.log('Submitting task data:', formattedData);
 
       let savedTask;
       if (task) {
@@ -177,7 +188,7 @@ const TaskForm = ({ isOpen, onClose, task = null, onTaskSaved }) => {
       <ModalContent>
         <ModalHeader>{task ? 'Edit Task' : 'Create New Task'}</ModalHeader>
         <ModalBody>
-          <Stack as="form" spacing={4} onSubmit={handleSubmit}>
+          <Stack spacing={4}>
             <FormControl isRequired isInvalid={!!errors.Title}>
               <FormLabel>Title</FormLabel>
               <Input
