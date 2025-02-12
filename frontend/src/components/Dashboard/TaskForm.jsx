@@ -143,16 +143,13 @@ const TaskForm = ({ isOpen, onClose, task = null, onTaskSaved }) => {
     setLoading(true);
 
     try {
-      // Format data for backend
       const formattedData = {
         ...formData,
-        DueDate: formData.DueDate ? formatDateForGo(formData.DueDate) : null
+        DueDate: formData.DueDate ? formatDateForGo(formData.DueDate) : null,
+        Status: formData.Status // Pastikan status terkirim
       };
 
-      // Log for debugging
-      console.log('Raw date from form:', formData.DueDate);
-      console.log('Formatted date:', formattedData.DueDate);
-      console.log('Submitting task data:', formattedData);
+      console.log('Sending data to server:', formattedData);
 
       let savedTask;
       if (task) {
@@ -160,6 +157,8 @@ const TaskForm = ({ isOpen, onClose, task = null, onTaskSaved }) => {
       } else {
         savedTask = await taskService.createTask(formattedData);
       }
+
+      console.log('Received response from server:', savedTask);
 
       toast({
         title: `Task ${task ? 'updated' : 'created'} successfully`,
