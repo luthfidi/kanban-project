@@ -2,6 +2,7 @@ package controllers
 
 import (
     "kanban-project/models"
+    "log"
     "net/http"
     "strconv"
 
@@ -17,24 +18,18 @@ func NewTaskController(db *gorm.DB) *TaskController {
     return &TaskController{DB: db}
 }
 
-func (tc *TaskController) GetTasks(c echo.Context) error {
-    userID := c.Get("userID").(uint)
-
-    var tasks []models.Task
-    if result := tc.DB.Where("user_id = ?", userID).Find(&tasks); result.Error != nil {
-        return echo.NewHTTPError(http.StatusInternalServerError, "Failed to fetch tasks")
-    }
-
-    return c.JSON(http.StatusOK, tasks)
-}
-
 func (tc *TaskController) CreateTask(c echo.Context) error {
     userID := c.Get("userID").(uint)
 
     var req models.CreateTaskRequest
     if err := c.Bind(&req); err != nil {
+        log.Printf("Error binding request: %v", err)
         return echo.NewHTTPError(http.StatusBadRequest, "Invalid request body")
     }
+
+    // Log received data for debugging
+    log.Printf("Received task data: %+v", req)
+    log.Printf("Due date: %v", req.DueDate)
 
     if req.Color == "" {
         req.Color = "default"
@@ -51,10 +46,22 @@ func (tc *TaskController) CreateTask(c echo.Context) error {
     }
 
     if result := tc.DB.Create(&task); result.Error != nil {
+        log.Printf("Error creating task: %v", result.Error)
         return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create task")
     }
 
     return c.JSON(http.StatusCreated, task)
+}
+
+func (tc *TaskController) GetTasks(c echo.Context) error {
+    userID := c.Get("userID").(uint)
+
+    var tasks []models.Task
+    if result := tc.DB.Where("user_id = ?", userID).Find(&tasks); result.Error != nil {
+        return echo.NewHTTPError(http.StatusInternalServerError, "Failed to fetch tasks")
+    }
+
+    return c.JSON(http.StatusOK, tasks)
 }
 
 func (tc *TaskController) UpdateTask(c echo.Context) error {
@@ -74,7 +81,11 @@ func (tc *TaskController) UpdateTask(c echo.Context) error {
         return echo.NewHTTPError(http.StatusBadRequest, "Invalid request body")
     }
 
-	updates := map[string]interface{}{
+    // Log received update data for debugging
+    log.Printf("Received update task data: %+v", req)
+    log.Printf("Update due date: %v", req.DueDate)
+
+    updates := map[string]interface{}{
         "title":       req.Title,
         "description": req.Description,
         "status":      req.Status,
@@ -84,6 +95,7 @@ func (tc *TaskController) UpdateTask(c echo.Context) error {
     }
 
     if result := tc.DB.Model(&task).Updates(updates); result.Error != nil {
+        log.Printf("Error updating task: %v", result.Error)
         return echo.NewHTTPError(http.StatusInternalServerError, "Failed to update task")
     }
 

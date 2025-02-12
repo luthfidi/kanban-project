@@ -18,7 +18,7 @@ type Task struct {
     Description string     `gorm:"type:text" json:"description"`
     Status      TaskStatus `gorm:"size:20;not null;default:'todo'" json:"status"`
     Category    string     `gorm:"size:100" json:"category"`
-    DueDate     time.Time  `json:"due_date"`
+    DueDate     time.Time  `gorm:"type:timestamptz;not null" json:"due_date"`
     Color       string     `gorm:"size:50;default:'default'" json:"color"`
     UserID      uint       `json:"user_id"`
     User        User       `gorm:"foreignKey:UserID" json:"-"`
@@ -27,18 +27,18 @@ type Task struct {
 }
 
 type CreateTaskRequest struct {
-    Title       string    `json:"title" validate:"required"`
-    Description string    `json:"description"`
-    Category    string    `json:"category"`
-    DueDate     time.Time `json:"due_date"`
-    Color       string    `json:"color"`
+    Title       string    `json:"Title" validate:"required"`
+    Description string    `json:"Description"`
+    Category    string    `json:"Category"`
+    DueDate     time.Time `json:"DueDate"`
+    Color       string    `json:"Color"`
 }
 
 type UpdateTaskRequest struct {
-    Title       string     `json:"title"`
-    Description string     `json:"description"`
-    Status      TaskStatus `json:"status"`
-    Category    string     `json:"category"`
-    DueDate     time.Time  `json:"due_date"`
-    Color       string     `json:"color"`
+    Title       string     `json:"Title"`
+    Description string     `json:"Description"`
+    Status      TaskStatus `json:"Status"`
+    Category    string     `json:"Category"`
+    DueDate     time.Time  `json:"DueDate"`
+    Color       string     `json:"Color"`
 }

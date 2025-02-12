@@ -56,11 +56,23 @@ const TaskForm = ({ isOpen, onClose, task = null, onTaskSaved }) => {
 
   useEffect(() => {
     if (task) {
+      let dueDateStr = '';
+      if (task.DueDate) {
+        try {
+          const date = new Date(task.DueDate);
+          if (!isNaN(date.getTime())) {
+            dueDateStr = date.toISOString().split('T')[0];
+          }
+        } catch (error) {
+          console.error('Error parsing task due date:', error);
+        }
+      }
+
       setFormData({
         Title: task.Title || '',
         Description: task.Description || '',
         Category: task.Category || '',
-        DueDate: task.DueDate ? new Date(task.DueDate).toISOString().split('T')[0] : '',
+        DueDate: dueDateStr,
         Status: task.Status || 'todo',
         Color: task.Color || 'default',
       });
@@ -85,7 +97,6 @@ const TaskForm = ({ isOpen, onClose, task = null, onTaskSaved }) => {
       ...prev,
       [name]: value,
     }));
-    // Clear error when field is changed
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -101,6 +112,17 @@ const TaskForm = ({ isOpen, onClose, task = null, onTaskSaved }) => {
     }));
   };
 
+  const formatDateForGo = (dateString) => {
+    if (!dateString) return null;
+    
+    // Parse input date (YYYY-MM-DD) dan set waktu ke midnight UTC
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    
+    // Format sesuai RFC3339 yang diharapkan oleh Go
+    return date.toISOString();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -111,11 +133,21 @@ const TaskForm = ({ isOpen, onClose, task = null, onTaskSaved }) => {
     setLoading(true);
 
     try {
+      // Format data untuk backend
+      const formattedData = {
+        ...formData,
+        DueDate: formatDateForGo(formData.DueDate)
+      };
+
+      // Log untuk debugging
+      console.log('Raw date from form:', formData.DueDate);
+      console.log('Formatted date:', formattedData.DueDate);
+
       let savedTask;
       if (task) {
-        savedTask = await taskService.updateTask(task.id, formData);
+        savedTask = await taskService.updateTask(task.id, formattedData);
       } else {
-        savedTask = await taskService.createTask(formData);
+        savedTask = await taskService.createTask(formattedData);
       }
 
       toast({
@@ -124,10 +156,10 @@ const TaskForm = ({ isOpen, onClose, task = null, onTaskSaved }) => {
         duration: 3000,
       });
 
-      onTaskSaved(savedTask); // Pass the saved task data
+      onTaskSaved(savedTask);
       onClose();
     } catch (error) {
-      console.error('Task creation error:', error);
+      console.error('Task operation error:', error);
       toast({
         title: 'Error',
         description: error.response?.data?.message || `Failed to ${task ? 'update' : 'create'} task`,
@@ -195,6 +227,7 @@ const TaskForm = ({ isOpen, onClose, task = null, onTaskSaved }) => {
                 type="date"
                 name="DueDate"
                 value={formData.DueDate}
+                min={new Date().toISOString().split('T')[0]}
                 onChange={handleChange}
               />
               <FormErrorMessage>{errors.DueDate}</FormErrorMessage>
